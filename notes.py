@@ -27,20 +27,32 @@ if not arguments:
     sys.exit(1)
 
 if arguments[0] not in cmds:
-    print(f"Invalid command {argument[0]}")
+    print(f"Invalid command {arguments[0]}")
 
 if arguments[0] == "read":
     # leitura das notas
     for line in open(filepath):
         titulo, tag, texto = line.split("\t")
-        if tag.lower() == arguments[1].lower(): # TODO: Tratar exception
-                print(f"title: {titulo}")
-                print(f"text: {texto}")
-                print("-" * 30)
-                print()
+        try:
+            tag.lower() == arguments[1].lower()
+        except IndexError as e:
+            print(f"[ERROR] {str(e)}")
+            print("You must specify tag for read a note")
+            sys.exit(1)
+
+        print(f"title: {titulo}")
+        print(f"text: {texto}")
+        print("-" * 30)
+        print()
 
 if arguments[0] == "new":
-    titulo = arguments[1] # TODO: Tratar exception
+    try:
+        titulo = arguments[1]
+    except IndexError as e:
+        print(f"[ERROR] {str(e)}")
+        print("You must specify title for new note")
+        sys.exit(1)
+
     text = [
         f"{titulo}",
         input("tag:").strip(),
