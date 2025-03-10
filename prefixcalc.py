@@ -30,6 +30,23 @@ __version__ = "0.1.1"
 
 import os
 import sys
+import logging
+from logging import handlers
+
+log_level = os.getenv("LOG_LEVEL", "WARNING").upper()
+log = logging.Logger("logs.py", log_level)
+fh = handlers.RotatingFileHandler(
+    "prefixcalc-exe.log",
+    maxBytes=10**6,
+    backupCount=10
+)
+fh.setLevel(log_level)
+fmt = logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s '
+    'l:%(lineno)d - f:%(filename)s: %(message)s'
+)
+fh.setFormatter(fmt)
+log.addHandler(fh)
 
 from datetime import datetime
 
@@ -50,7 +67,7 @@ operation, *nums = arguments
 
 valid_operations = ("sum", "sub", "mul", "div")
 if operation not in valid_operations:
-    print("OPeração inválida")
+    print("Operação inválida")
     print(valid_operations)
     sys.exit(1)
 
@@ -88,11 +105,10 @@ timestamp = datetime.now().isoformat()
 user = os.getenv('USER', 'anonymos')
 
 try:
-    with open (filepath, "a") as arquivo:
+    with open (filepath, "w") as arquivo:
         arquivo.write(f"{timestamp} - {user} - {operation}, {n1}, {n2} = {result}\n")
 except PermissionError as e:
-    # TODO: logging
-    print(f"[ERROR] {str(e)}")
+    log.error("You dont have permission to create filepath: %s", str(e))
     sys.exit(1)
 
 print(f"O resultado é {result}")
